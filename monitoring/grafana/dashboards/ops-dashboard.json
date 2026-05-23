@@ -1,0 +1,113 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "API Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(bharat_api_requests_total[5m])",
+          "legendFormat": "{{path}} {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "API Latency P95",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "bharat_api_latency_ms{quantile=\"0.95\"}",
+          "legendFormat": "{{path}}"
+        }
+      ]
+    },
+    {
+      "title": "LLM Calls by Provider",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(bharat_llm_calls_total[5m])",
+          "legendFormat": "{{provider}} {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "LLM Token Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(bharat_llm_input_tokens_total[5m])",
+          "legendFormat": "input: {{provider}}"
+        },
+        {
+          "expr": "rate(bharat_llm_output_tokens_total[5m])",
+          "legendFormat": "output: {{provider}}"
+        }
+      ]
+    },
+    {
+      "title": "Ingestion Documents Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "rate(bharat_ingestion_documents_total[5m])",
+          "legendFormat": "{{source}}"
+        }
+      ]
+    },
+    {
+      "title": "Cache Hit Rate",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(bharat_cache_total{result=\"hit\"}) / sum(bharat_cache_total) * 100",
+          "legendFormat": "Hit Rate %"
+        }
+      ]
+    },
+    {
+      "title": "System Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "expr": "bharat_uptime_seconds / 3600",
+          "legendFormat": "hours"
+        }
+      ]
+    },
+    {
+      "title": "Total Embeddings Generated",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 24 },
+      "targets": [
+        {
+          "expr": "bharat_embeddings_total",
+          "legendFormat": "total"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["bharat", "market-intelligence"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "Asia/Kolkata",
+  "title": "Bharat Market Intelligence — Operations Dashboard",
+  "uid": "bharat-ops",
+  "version": 1
+}

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Intelligence Dashboard — Bharat Market Intelligence</title>
+    <meta name="description" content="Real-time market intelligence dashboard showing latest corporate announcements, events, sector heatmap, and AI analysis for Indian markets.">
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/style.css?v=4">
+    <style>
+        .dashboard-layout {
+            padding-top: calc(var(--nav-height) + var(--space-xl));
+            min-height: 100vh;
+            padding-bottom: var(--space-3xl);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--space-2xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Filter Buttons --- */
+        .filter-btn {
+            padding: 7px 16px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-medium);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-primary);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: 0.02em;
+        }
+
+        .filter-btn:hover {
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--text-secondary);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .filter-btn.active {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: var(--accent-primary-muted);
+            font-weight: 600;
+        }
+
+        /* --- Events Feed --- */
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar-card {
+            margin-bottom: var(--space-md);
+        }
+
+        .sidebar-card h3 {
+            font-size: 0.72rem;
+            margin-bottom: var(--space-md);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        /* --- Sector Bars --- */
+        .sector-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+        }
+
+        .sector-bar-fill {
+            height: 6px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width var(--transition-slow);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
+        }
+
+        .sector-name {
+            min-width: 110px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .sector-count {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            min-width: 20px;
+            text-align: right;
+        }
+
+        /* --- Main Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--space-xl);
+        }
+
+        /* --- Connection Status --- */
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .connection-status.connected {
+            background: var(--color-positive-bg);
+            color: var(--color-positive);
+        }
+
+        .connection-status.disconnected {
+            background: var(--color-negative-bg);
+            color: var(--color-negative);
+        }
+
+        .connection-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .connection-status.connected .dot {
+            animation: pulse-dot 2s infinite;
+        }
+
+        .last-updated {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.02em;
+        }
+
+        /* Quick link styling */
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+        }
+
+        .quick-link:hover {
+            background: var(--bg-glass-hover);
+            border-color: rgba(245, 158, 11, 0.2);
+            color: var(--text-primary);
+        }
+
+        /* Disclaimer card */
+        .disclaimer-card {
+            background: var(--color-warning-bg);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+        }
+
+        .disclaimer-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        /* --- Market Clock Widget --- */
+        .market-clock-widget {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+            padding: 18px 28px;
+            margin-bottom: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .market-clock-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            transition: background 0.6s ease;
+        }
+
+        .market-clock-widget.market-open::before {
+            background: linear-gradient(90deg, transparent, var(--color-positive), transparent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .market-clock-widget.market-preopen::before {
+            background: linear-gradient(90deg, transparent, var(--color-warning), transparent);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .market-clock-widget.market-closing::before {
+            background: linear-gradient(90deg, transparent, #f97316, transparent);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .market-clock-widget.market-closed::before {
+            background: linear-gradient(90deg, transparent, var(--color-negative), transparent);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+        }
+
+        .clock-time-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 200px;
+        }
+
+        .clock-digital {
+            font-family: var(--font-mono);
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            text-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+        }
+
+        .clock-date {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .clock-divider {
+            width: 1px;
+            height: 56px;
+            background: var(--border-medium);
+            flex-shrink: 0;
+        }
+
+        .clock-status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .market-status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .market-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .market-status-dot::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0;
+        }
+
+        .market-status-dot.live {
+            background: var(--color-positive);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .market-status-dot.preopen {
+            background: var(--color-warning);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        .market-status-dot.closing {
+            background: #f97316;
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+            animation: pulse-glow 1s infinite;
+        }
+
+        .market-status-dot.closed {
+            background: var(--color-negative);
+            opacity: 0.7;
+        }
+
+        .market-status-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .market-status-label.live { color: var(--color-positive); }
+        .market-status-label.preopen { color: var(--color-warning); }
+        .market-status-label.closing { color: #f97316; }
+        .market-status-label.closed { color: var(--color-negative); }
+
+        .market-session-info {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            letter-spacing: 0.01em;
+        }
+
+        .clock-countdown-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            min-width: 140px;
+        }
+
+        .countdown-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+
+        .countdown-time {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
+        }
+
+        .countdown-time.live { color: var(--color-positive); }
+        .countdown-time.preopen { color: var(--color-warning); }
+        .countdown-time.closing { color: #f97316; }
+        .countdown-time.closed { color: var(--text-muted); }
+
+        .nse-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .market-clock-widget {
+                flex-wrap: wrap;
+                gap: var(--space-md);
+                padding: 16px 20px;
+            }
+            .clock-divider {
+                display: none;
+            }
+            .clock-countdown-section {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+            }
+            .clock-digital {
+                font-size: 1.8rem;
+            }
+            .clock-time-section {
+                min-width: auto;
+            }
+            .market-clock-widget {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .clock-countdown-section {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <img src="assets/images/favicon.svg" class="nav-brand-icon" alt="Bharat Intel Logo">
+                <span>Bharat Intel</span>
+            </a>
+            
+            <form class="nav-search" action="company.html" method="GET">
+                <input type="text" id="global-search" name="symbol" placeholder="Search NSE Top 500..." required autocomplete="off">
+                <button type="submit">🔍</button>
+            </form>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="bullish.html">Bullish</a></li>
+                <li><a href="bearish.html">Bearish</a></li>
+                <li><a href="market-map.html">3D Map</a></li>
+                <li><a href="audit.html">Audit</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="dashboard-layout">
+        <div class="container">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <div>
+                    <h1>Live Intelligence <span class="text-gradient">Dashboard</span></h1>
+                    <span class="connection-status" id="connection-status">
+                        <span class="dot"></span>
+                        <span id="status-text">Connecting...</span>
+                    </span>
+                    <div class="last-updated" id="last-updated"></div>
+                </div>
+                <div class="dashboard-controls">
+                    <button class="filter-btn active" data-filter="all">All Events</button>
+                    <button class="filter-btn" data-filter="positive">Positive</button>
+                    <button class="filter-btn" data-filter="negative">Negative</button>
+                    <button class="filter-btn" data-filter="neutral">Neutral</button>
+                </div>
+            </div>
+
+            <!-- Market Clock Widget -->
+            <div class="market-clock-widget market-closed" id="market-clock-widget">
+                <div class="clock-time-section">
+                    <div class="clock-digital" id="clock-digital">--:--:--</div>
+                    <div class="clock-date" id="clock-date">Loading...</div>
+                </div>
+                <div class="clock-divider"></div>
+                <div class="clock-status-section">
+                    <div class="market-status-row">
+                        <div class="market-status-dot closed" id="market-status-dot"></div>
+                        <span class="market-status-label closed" id="market-status-label">Checking...</span>
+                        <span class="nse-badge">NSE</span>
+                    </div>
+                    <div class="market-session-info" id="market-session-info">Loading market status...</div>
+                </div>
+                <div class="clock-divider"></div>
+                <div class="clock-countdown-section">
+                    <div class="countdown-label" id="countdown-label">—</div>
+                    <div class="countdown-time closed" id="countdown-time">--:--:--</div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stat-grid" id="dashboard-stats" style="margin-bottom: var(--space-2xl);"></div>
+
+            <!-- Main Grid -->
+            <div class="dashboard-grid">
+                <!-- Events List -->
+                <div>
+                    <div class="events-list" id="events-list">
+                        <div class="loading-spinner">Loading market events...</div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside>
+                    <div class="glass-card sidebar-card">
+                        <h3>Sector Activity</h3>
+                        <div id="sector-bars"></div>
+                    </div>
+
+                    <div class="glass-card sidebar-card">
+                        <h3>Quick Links</h3>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <a href="bullish.html" class="quick-link">📈 Bullish Watchlist</a>
+                            <a href="bearish.html" class="quick-link">📉 Bearish Risk List</a>
+                            <a href="chat.html" class="quick-link">💬 AI Chat</a>
+                            <a href="market-map.html" class="quick-link">🌐 3D Market Map</a>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer-card sidebar-card">
+                        <p>
+                            <strong>Disclaimer:</strong> This dashboard shows AI-analyzed public market events for informational purposes only.
+                            Not investment advice. Verify independently.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-copy">© 2026 Bharat Market Intelligence Agent</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/guide.js"></script>
+    <script src="assets/js/apikeys.js"></script>
+    <script src="assets/js/search.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

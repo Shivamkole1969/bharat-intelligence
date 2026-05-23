@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Market Intelligence — Real-Time AI Intelligence for Indian Markets</title>
+    <meta name="description" content="Track NSE/BSE announcements, filings, earnings, and news with AI-powered source-cited market intelligence. Bullish and bearish signal watchlists, company intelligence, and more.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Styles -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/style.css?v=4">
+
+    <style>
+        /* Landing page specific styles */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: var(--nav-height);
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--bg-primary) 70%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 4px 16px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-accent);
+            background: var(--accent-primary-glow);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-xl);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .hero-eyebrow .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.6s ease-out 0.1s forwards;
+            opacity: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-2xl);
+            animation: fadeInUp 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        /* Live preview section */
+        .live-preview {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .preview-header h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .preview-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Live event ticker */
+        .ticker-container {
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            margin-bottom: var(--space-2xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .ticker-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .ticker-header .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-positive);
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: ticker-scroll 30s linear infinite;
+            padding: var(--space-md) 0;
+        }
+
+        .ticker-item {
+            flex-shrink: 0;
+            padding: 0 var(--space-2xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .ticker-item .company {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* AI Demo section */
+        .ai-demo {
+            background: var(--bg-secondary);
+        }
+
+        .demo-chat {
+            max-width: 700px;
+            margin: 0 auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .demo-chat-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-glass);
+        }
+
+        .demo-chat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .demo-chat-messages {
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            min-height: 300px;
+        }
+
+        .demo-msg {
+            max-width: 85%;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .demo-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+            color: white;
+        }
+
+        .demo-msg.assistant {
+            align-self: flex-start;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .demo-msg .citation {
+            display: block;
+            margin-top: var(--space-sm);
+            padding-top: var(--space-sm);
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .demo-input {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding: 8px 8px 8px 18px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            transition: all var(--transition-fast);
+        }
+
+        .demo-input:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3), inset 0 2px 10px rgba(245, 158, 11, 0.05);
+        }
+
+        .demo-input input {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            outline: none;
+            min-height: 24px;
+        }
+
+        .demo-input button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-primary), #d97706);
+            color: var(--bg-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .demo-input button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Data sources section */
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-glass);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .source-tag:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .source-tag .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-positive);
+        }
+
+        .sources-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+        }
+
+        /* Trust section */
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .trust-card {
+            text-align: center;
+        }
+
+        .trust-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .trust-title {
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+        }
+
+        .trust-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="main-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <img src="assets/images/favicon.svg" class="nav-brand-icon" alt="Bharat Intel Logo">
+                <span>Bharat Intel</span>
+            </a>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="bullish.html">Bullish</a></li>
+                <li><a href="bearish.html">Bearish</a></li>
+                <li><a href="market-map.html">3D Map</a></li>
+                <li><a href="audit.html">Audit</a></li>
+                <li><a href="dashboard.html" class="nav-cta">Launch Dashboard →</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section with 3D Canvas -->
+    <section class="hero" id="hero">
+        <canvas class="hero-canvas" id="hero-canvas"></canvas>
+        <div class="hero-overlay"></div>
+
+        <div class="container hero-content">
+            <div class="hero-eyebrow">
+                <span class="pulse-dot"></span>
+                Live Market Intelligence
+            </div>
+
+            <h1>
+                Real-Time <span class="text-gradient">AI Intelligence</span>
+                for Indian Markets
+            </h1>
+
+            <p class="hero-subtitle">
+                Track NSE/BSE announcements, company filings, earnings transcripts, and public news.
+                Get source-cited AI summaries, risk flags, bullish & bearish signal watchlists — all in one platform.
+            </p>
+
+            <div class="hero-actions">
+                <a href="dashboard.html" class="btn btn-primary btn-lg">
+                    Explore Dashboard →
+                </a>
+                <a href="chat.html" class="btn btn-secondary btn-lg">
+                    Ask the AI Analyst
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Intelligence Preview -->
+    <section class="live-preview section" id="live-preview">
+        <div class="container">
+            <div class="preview-header">
+                <h2>Live Market <span class="text-gradient">Intelligence Feed</span></h2>
+                <p>Real-time event detection across Indian markets. Every event is source-cited and AI-analyzed.</p>
+            </div>
+
+            <!-- Event Ticker -->
+            <div class="ticker-container">
+                <div class="ticker-header">
+                    <span class="live-dot"></span>
+                    Live Events
+                </div>
+                <div class="ticker-track" id="ticker-track">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Sample Event Cards -->
+            <div class="grid-2" id="sample-events">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="stat-grid" id="stats-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Demo Section -->
+    <section class="ai-demo section" id="ai-demo">
+        <div class="container">
+            <div class="preview-header">
+                <h2>Ask the <span class="text-gradient">AI Market Analyst</span></h2>
+                <p>Get source-grounded answers about companies, events, risks, and market trends.</p>
+            </div>
+
+            <div class="demo-chat" id="demo-chat">
+                <div class="demo-chat-header">
+                    <div class="demo-chat-dot" style="background: var(--color-negative);"></div>
+                    <div class="demo-chat-dot" style="background: var(--color-warning);"></div>
+                    <div class="demo-chat-dot" style="background: var(--color-positive);"></div>
+                    <span style="margin-left: auto; font-size: 0.8rem; color: var(--text-muted);">Bharat Intel AI</span>
+                </div>
+                <div class="demo-chat-messages" id="demo-messages">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="demo-input">
+                    <input type="text" id="demo-input" placeholder="Ask about any Indian company or market event..." aria-label="Chat input">
+                    <button id="demo-send" aria-label="Send message">→</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="preview-header">
+                <h2>Enterprise-Grade <span class="text-gradient">Capabilities</span></h2>
+                <p>Built for production — not just a demo. Real data pipelines, AI governance, and scalable architecture.</p>
+            </div>
+
+            <div class="grid-4" id="features-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Sources -->
+    <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="preview-header">
+                <h2>Trusted <span class="text-gradient">Data Sources</span></h2>
+                <p>All intelligence is derived from publicly available, legally compliant data sources.</p>
+            </div>
+
+            <div class="sources-grid" id="sources-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust & Citation -->
+    <section class="section" id="trust">
+        <div class="container">
+            <div class="preview-header">
+                <h2>Built on <span class="text-gradient">Trust & Transparency</span></h2>
+                <p>Every AI answer is backed by verifiable source citations. No hallucinations, no guesswork.</p>
+            </div>
+
+            <div class="trust-grid" id="trust-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);">
+        <div class="container" style="text-align: center;">
+            <h2 style="margin-bottom: var(--space-md);">Start Exploring <span class="text-gradient">Indian Market Intelligence</span></h2>
+            <p style="color: var(--text-secondary); margin-bottom: var(--space-2xl); max-width: 500px; margin-left: auto; margin-right: auto;">
+                Free to use. No registration required for the public dashboard.
+            </p>
+            <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+                <a href="dashboard.html" class="btn btn-primary btn-lg">Launch Dashboard →</a>
+                <a href="chat.html" class="btn btn-secondary btn-lg">Try AI Chat</a>
+                <a href="bullish.html" class="btn btn-secondary btn-lg">View Watchlists</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-disclaimer">
+                <strong>Important Disclaimer:</strong> This platform is for educational, research, and informational purposes only.
+                It does not provide personalized investment advice, guaranteed returns, target prices, or buy/sell/short recommendations.
+                Please verify all information independently and consult a SEBI-registered investment adviser before making investment decisions.
+            </div>
+
+            <div class="footer-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="chat.html">AI Chat</a>
+                <a href="bullish.html">Bullish Watchlist</a>
+                <a href="bearish.html">Bearish Watchlist</a>
+                <a href="market-map.html">3D Map</a>
+                <a href="audit.html">System Audit</a>
+            </div>
+
+            <p class="footer-copy">
+                © 2026 Bharat Market Intelligence Agent. Built with FastAPI, LangGraph, Supabase, and open-source AI.
+            </p>
+        </div>
+    </footer>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/guide.js"></script>
+    <script src="assets/js/apikeys.js"></script>
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>

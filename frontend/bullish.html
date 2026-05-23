@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bullish Signal Watchlist — Bharat Market Intelligence</title>
+    <meta name="description" content="AI-generated bullish signal candidates from public Indian market data. Not buy recommendations — for research purposes only.">
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/style.css?v=4">
+    <link rel="stylesheet" href="assets/css/watchlist.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="assets/images/favicon.svg" class="nav-brand-icon" alt="Bharat Intel Logo"><span>Bharat Intel</span></a>
+            
+            <form class="nav-search" action="company.html" method="GET">
+                <input type="text" id="global-search" name="symbol" placeholder="Search NSE Top 500..." required autocomplete="off">
+                <button type="submit">🔍</button>
+            </form>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="bullish.html" class="active">Bullish</a></li>
+                <li><a href="bearish.html">Bearish</a></li>
+                <li><a href="market-map.html">3D Map</a></li>
+                <li><a href="audit.html">Audit</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="watchlist-layout">
+        <div class="container">
+            <div class="watchlist-header">
+                <div>
+                    <h1>📈 Bullish Signal <span class="text-gradient">Watchlist</span></h1>
+                    <p class="watchlist-subtitle">Top companies by bullish score from public signal analysis</p>
+                </div>
+                <span class="badge badge-warning" style="font-size: 0.85rem; padding: 6px 16px;">
+                    🔬 Research Only — Not Buy Recommendations
+                </span>
+            </div>
+
+            <div class="watchlist-disclaimer">
+                <strong>Important:</strong> These are signal candidates identified from public data for research purposes.
+                This is NOT a buy recommendation. Scores are AI-generated and may be inaccurate.
+                Always do your own research and consult a SEBI-registered adviser.
+            </div>
+
+            <div class="watchlist-grid" id="watchlist-grid">
+                <div class="loading-spinner">Loading signal data...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top: var(--space-3xl);">
+        <div class="container">
+            <div class="footer-disclaimer">
+                <strong>Disclaimer:</strong> This watchlist is for educational and informational purposes only.
+                Not investment advice. Past signals do not guarantee future performance.
+            </div>
+            <p class="footer-copy">© 2026 Bharat Market Intelligence Agent</p>
+        </div>
+    </footer>
+
+    <!-- TradingView Modal -->
+    <div id="tv-modal" class="tv-modal">
+        <div class="tv-modal-content">
+            <button id="tv-modal-close" class="tv-modal-close" aria-label="Close chart">&times;</button>
+            
+            <div class="tv-modal-header">
+                <h3 id="tv-modal-title" class="tv-modal-title">Company Analysis</h3>
+                <div class="tv-tabs">
+                    <button class="tv-tab active" data-tab="chart">Interactive Chart</button>
+                    <button class="tv-tab" data-tab="fundamentals">Fundamentals</button>
+                    <button class="tv-tab" data-tab="technicals">Technicals</button>
+                </div>
+            </div>
+            
+            <div class="tv-tab-content active" id="tab-chart">
+                <div id="tv_chart_container"></div>
+            </div>
+            
+            <div class="tv-tab-content" id="tab-fundamentals">
+                <div id="tv_fundamentals_container" class="tradingview-widget-container"></div>
+            </div>
+            
+            <div class="tv-tab-content" id="tab-technicals">
+                <div id="tv_technicals_container" class="tradingview-widget-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TradingView Advanced Chart Library -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/guide.js"></script>
+    <script src="assets/js/apikeys.js"></script>
+    <script src="assets/js/search.js"></script>
+    <script src="assets/js/watchlist.js" data-type="bullish"></script>
+</body>
+</html>

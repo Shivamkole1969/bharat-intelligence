@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Audit & Quality — Bharat Market Intelligence</title>
+    <meta name="description" content="Data quality dashboard, audit log chain verification, system health, and evaluation metrics for the Bharat Market Intelligence platform.">
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/style.css?v=4">
+    <style>
+        .audit-layout {
+            padding-top: calc(var(--nav-height) + var(--space-xl));
+            min-height: 100vh;
+            padding-bottom: var(--space-3xl);
+        }
+
+        .audit-header {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .audit-header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+
+        .audit-header p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-2xl);
+        }
+
+        /* --- Stat Numbers --- */
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .stat-number.positive { color: var(--color-positive); }
+        .stat-number.negative { color: var(--color-negative); }
+        .stat-number.warning { color: var(--color-warning); }
+        .stat-number.neutral { color: var(--accent-primary); }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- Section Titles --- */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: var(--accent-primary);
+            border-radius: var(--radius-full);
+            flex-shrink: 0;
+        }
+
+        .section-gap {
+            margin-top: var(--space-2xl);
+        }
+
+        /* --- Health Rows --- */
+        .health-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.82rem;
+            transition: background var(--transition-fast);
+        }
+
+        .health-row:hover {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        .health-row:last-child {
+            border-bottom: none;
+        }
+
+        .health-row .health-name {
+            color: var(--text-secondary);
+        }
+
+        .health-status {
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .health-status.healthy {
+            background: var(--color-positive-bg);
+            color: var(--color-positive);
+        }
+
+        .health-status.degraded,
+        .health-status.stale {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .health-status.unhealthy,
+        .health-status.error {
+            background: var(--color-negative-bg);
+            color: var(--color-negative);
+        }
+
+        .health-status.not_configured {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+        }
+
+        /* --- Audit Table --- */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .audit-table th {
+            text-align: left;
+            padding: 10px var(--space-md);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-medium);
+            white-space: nowrap;
+        }
+
+        .audit-table td {
+            padding: 10px var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+        }
+
+        .audit-table tbody tr {
+            transition: background var(--transition-fast);
+        }
+
+        .audit-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        /* --- Chain Badge --- */
+        .chain-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .chain-badge.valid {
+            background: var(--color-positive-bg);
+            color: var(--color-positive);
+        }
+
+        .chain-badge.invalid {
+            background: var(--color-negative-bg);
+            color: var(--color-negative);
+        }
+
+        @media (max-width: 768px) {
+            .audit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="assets/images/favicon.svg" class="nav-brand-icon" alt="Bharat Intel Logo"><span>Bharat Intel</span></a>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="bullish.html">Bullish</a></li>
+                <li><a href="bearish.html">Bearish</a></li>
+                <li><a href="market-map.html">3D Map</a></li>
+                <li><a href="audit.html" class="active">Audit</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="audit-layout">
+        <div class="container">
+            <div class="audit-header">
+                <h1>🔍 System <span class="text-gradient">Audit & Quality</span></h1>
+                <p>Data integrity, system health, and pipeline evaluation metrics</p>
+            </div>
+
+            <!-- System Health -->
+            <h2 class="section-title">System Health</h2>
+            <div class="audit-grid" id="health-grid">
+                <div class="glass-card"><div class="stat-number neutral">—</div><div class="stat-label">Loading health data...</div></div>
+            </div>
+
+            <!-- Pipeline Stats -->
+            <h2 class="section-title section-gap">Pipeline Statistics</h2>
+            <div class="audit-grid" id="stats-grid">
+                <div class="glass-card"><div class="stat-number neutral">—</div><div class="stat-label">Loading stats...</div></div>
+            </div>
+
+            <!-- Audit Chain -->
+            <h2 class="section-title section-gap">Audit Log Chain Verification</h2>
+            <div class="glass-card" id="chain-verify">
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Verifying hash chain integrity...</p>
+            </div>
+
+            <!-- Recent Audit Logs -->
+            <h2 class="section-title section-gap">Recent Audit Entries</h2>
+            <div class="glass-card" style="overflow-x: auto;">
+                <table class="audit-table" id="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>Hash</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-tbody">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top: var(--space-3xl);">
+        <div class="container">
+            <p class="footer-copy">© 2026 Bharat Market Intelligence Agent — System Audit Dashboard</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/guide.js"></script>
+    <script src="assets/js/apikeys.js"></script>
+    <script src="assets/js/audit.js"></script>
+</body>
+</html>

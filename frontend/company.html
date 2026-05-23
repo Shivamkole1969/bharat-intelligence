@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Intelligence Hub — Bharat Market Intelligence</title>
+    <meta name="description" content="Comprehensive real-time analysis for top Indian companies.">
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/style.css?v=6">
+    <style>
+        .company-layout {
+            padding-top: calc(var(--nav-height) + var(--space-xl));
+            min-height: 100vh;
+            padding-bottom: var(--space-3xl);
+        }
+
+        .company-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+        }
+
+        .company-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .company-title h1 {
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .company-symbol {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+        }
+
+        .company-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: var(--space-xs);
+        }
+
+        /* --- Widgets --- */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .widget-full {
+            grid-column: 1 / -1;
+            height: 600px;
+        }
+
+        .widget-half {
+            height: 450px;
+        }
+
+        .widget-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+        }
+
+        .widget-container:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card-hover);
+            border-color: var(--border-medium);
+        }
+
+        .widget-header {
+            padding: 14px var(--space-lg);
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .widget-body {
+            flex: 1;
+            position: relative;
+        }
+
+        /* --- AI Section --- */
+        .ai-section {
+            padding-top: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 22px;
+            background: var(--accent-primary);
+            border-radius: var(--radius-full);
+            flex-shrink: 0;
+        }
+
+        .ai-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-lg);
+        }
+
+        .score-card {
+            text-align: center;
+            padding: var(--space-2xl) var(--space-xl);
+        }
+
+        .score-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            margin: 0 auto var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), transparent);
+            border: 2px solid var(--border-medium);
+            position: relative;
+        }
+
+        .score-circle.bullish { 
+            border-color: var(--color-positive); 
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), 0 8px 24px rgba(16, 185, 129, 0.25); 
+        }
+        
+        .score-circle.bearish { 
+            border-color: var(--color-negative); 
+            background: linear-gradient(135deg, rgba(240, 99, 85, 0.1), transparent);
+            box-shadow: 0 0 0 4px rgba(240, 99, 85, 0.15), 0 8px 24px rgba(240, 99, 85, 0.25); 
+        }
+
+        .factors-list {
+            text-align: left;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .factors-list h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .factors-list ul {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding-left: 20px;
+            margin-bottom: var(--space-lg);
+            line-height: 1.6;
+        }
+
+        .factors-list li {
+            margin-bottom: 6px;
+        }
+
+        /* --- News Feed --- */
+        .news-header {
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .news-item {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background var(--transition-fast);
+        }
+        
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .news-item:last-child { border-bottom: none; }
+        
+        .news-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .news-time::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            display: inline-block;
+        }
+
+        .news-title {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .news-summary {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        @media (max-width: 1024px) {
+            .widget-grid { grid-template-columns: 1fr; }
+            .ai-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ═══ Multi-Timeframe Stock Rating ═══ */
+        .stock-rating-section {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .sr-overall-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            gap: var(--space-xl);
+        }
+
+        .sr-overall-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            flex-shrink: 0;
+        }
+
+        .sr-overall-badge {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            font-family: var(--font-mono);
+            border: 3px solid rgba(255,255,255,0.1);
+            transition: all 0.5s ease;
+        }
+
+        .sr-overall-badge.strong_buy { background: rgba(34,197,94,0.15); color: #22c55e; border-color: rgba(34,197,94,0.3); text-shadow: 0 0 20px rgba(34,197,94,0.3); }
+        .sr-overall-badge.buy { background: rgba(74,222,128,0.12); color: #4ade80; border-color: rgba(74,222,128,0.25); }
+        .sr-overall-badge.neutral { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+        .sr-overall-badge.sell { background: rgba(248,113,113,0.12); color: #f87171; border-color: rgba(248,113,113,0.25); }
+        .sr-overall-badge.strong_sell { background: rgba(239,68,68,0.15); color: #ef4444; border-color: rgba(239,68,68,0.3); text-shadow: 0 0 20px rgba(239,68,68,0.3); }
+
+        .sr-overall-label {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sr-overall-score {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            font-family: var(--font-mono);
+        }
+
+        .sr-overall-conf {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .sr-overall-right {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .sr-factor-tag {
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .sr-factor-tag.bullish { color: #22c55e; border-color: rgba(34,197,94,0.2); }
+        .sr-factor-tag.bearish { color: #ef4444; border-color: rgba(239,68,68,0.2); }
+
+        /* Timeframe Grid */
+        .sr-timeframe-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .sr-tf-card {
+            padding: var(--space-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sr-tf-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .sr-tf-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            transition: background 0.4s ease;
+        }
+
+        .sr-tf-card.strong_buy::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+        .sr-tf-card.buy::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .sr-tf-card.neutral::before { background: linear-gradient(90deg, #f59e0b, #eab308); }
+        .sr-tf-card.sell::before { background: linear-gradient(90deg, #f87171, #ef4444); }
+        .sr-tf-card.strong_sell::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        .sr-tf-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sr-tf-rating {
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin: 4px 0;
+        }
+
+        .sr-tf-rating.strong_buy { color: #22c55e; }
+        .sr-tf-rating.buy { color: #4ade80; }
+        .sr-tf-rating.neutral { color: #f59e0b; }
+        .sr-tf-rating.sell { color: #f87171; }
+        .sr-tf-rating.strong_sell { color: #ef4444; }
+
+        .sr-tf-score {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            line-height: 1;
+        }
+
+        .sr-tf-score.positive { color: #22c55e; }
+        .sr-tf-score.negative { color: #ef4444; }
+        .sr-tf-score.zero { color: #f59e0b; }
+
+        .sr-tf-conf {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .sr-tf-indicators {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .sr-tf-ind {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.04);
+            color: var(--text-muted);
+        }
+
+        /* Loading spinner */
+        .sr-loading .sr-tf-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-subtle);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin-rating 0.8s linear infinite;
+        }
+
+        @keyframes spin-rating {
+            to { transform: rotate(360deg); }
+        }
+
+        /* News Impact */
+        .sr-news-impact {
+            padding: var(--space-lg);
+        }
+
+        .sr-news-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0 0 var(--space-md) 0;
+            color: var(--text-primary);
+        }
+
+        .sr-news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .sr-news-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            transition: background 0.2s ease;
+        }
+
+        .sr-news-item:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .sr-news-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .sr-news-dot.positive { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+        .sr-news-dot.negative { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+        .sr-news-dot.neutral { background: #f59e0b; }
+
+        .sr-news-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sr-news-headline {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .sr-news-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .sr-timeframe-grid { grid-template-columns: repeat(2, 1fr); }
+            .sr-overall-card { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="assets/images/favicon.svg" class="nav-brand-icon" alt="Bharat Intel Logo"><span>Bharat Intel</span></a>
+            
+            <form class="nav-search" action="company.html" method="GET">
+                <input type="text" id="global-search" name="symbol" placeholder="Search NSE Top 500..." required autocomplete="off">
+                <button type="submit">🔍</button>
+            </form>
+
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="bullish.html">Bullish</a></li>
+                <li><a href="bearish.html">Bearish</a></li>
+                <li><a href="market-map.html">3D Map</a></li>
+                <li><a href="audit.html">Audit</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="company-layout">
+        <div class="container">
+            <div class="company-header">
+                <div class="company-title">
+                    <h1><span id="c-name">Loading...</span> <span class="company-symbol" id="c-symbol">---</span></h1>
+                    <p class="company-subtitle" id="c-sector">Sector Intelligence Hub</p>
+                </div>
+                <div id="c-price-box" style="text-align: right; display: none;">
+                    <div style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); line-height: 1;">₹ <span id="c-price">--</span></div>
+                    <div style="font-size: 0.95rem; font-weight: 600; margin-top: 6px;" id="c-change">--</div>
+                </div>
+            </div>
+
+            <!-- ═══ Prediction Meter — the first thing investors see ═══ -->
+            <div class="prediction-meter-section" id="prediction-meter-section">
+                <div class="meter-grid">
+                    <!-- Gauge -->
+                    <div class="glass-card meter-gauge-card">
+                        <div class="meter-gauge-container">
+                            <canvas id="prediction-gauge" width="280" height="160"></canvas>
+                            <div class="meter-direction" id="meter-direction">Analyzing...</div>
+                            <div class="meter-confidence" id="meter-confidence">—</div>
+                        </div>
+                        <div class="meter-labels">
+                            <span class="meter-label bearish-label">STRONG SELL</span>
+                            <span class="meter-label neutral-label">NEUTRAL</span>
+                            <span class="meter-label bullish-label">STRONG BUY</span>
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="glass-card meter-details-card">
+                        <h3 class="meter-details-title">📊 Prediction Intelligence</h3>
+                        <div class="meter-indicators" id="meter-indicators">
+                            <div class="mi-row">
+                                <span class="mi-label">Trend (EMA Stack)</span>
+                                <span class="mi-value" id="mi-trend">—</span>
+                            </div>
+                            <div class="mi-row">
+                                <span class="mi-label">Momentum (RSI)</span>
+                                <span class="mi-value" id="mi-rsi">—</span>
+                            </div>
+                            <div class="mi-row">
+                                <span class="mi-label">Candlestick Patterns</span>
+                                <span class="mi-value" id="mi-patterns">—</span>
+                            </div>
+                            <div class="mi-row">
+                                <span class="mi-label">Support Level</span>
+                                <span class="mi-value mi-support" id="mi-support">—</span>
+                            </div>
+                            <div class="mi-row">
+                                <span class="mi-label">Resistance Level</span>
+                                <span class="mi-value mi-resistance" id="mi-resistance">—</span>
+                            </div>
+                        </div>
+                        <div class="meter-patterns-summary" id="meter-patterns-summary"></div>
+                        <p class="meter-disclaimer">Based on Steve Nison's candlestick techniques + technical indicators. Not investment advice.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ Multi-Timeframe Stock Rating Card ═══ -->
+            <div class="stock-rating-section" id="stock-rating-section">
+                <div class="section-header-row" style="margin-bottom: var(--space-lg);">
+                    <div>
+                        <h2 class="section-title">📊 Multi-Timeframe Stock Rating</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-top: var(--space-xs);">Technical analysis across 4 timeframes — EMA · RSI · Patterns · Volume</p>
+                    </div>
+                </div>
+
+                <!-- Overall Consensus -->
+                <div class="glass-card sr-overall-card" id="sr-overall">
+                    <div class="sr-overall-left">
+                        <div class="sr-overall-badge" id="sr-overall-badge">—</div>
+                        <div class="sr-overall-meta">
+                            <div class="sr-overall-label" id="sr-overall-label">Loading...</div>
+                            <div class="sr-overall-score" id="sr-overall-score">Score: —</div>
+                            <div class="sr-overall-conf" id="sr-overall-conf">Confidence: —</div>
+                        </div>
+                    </div>
+                    <div class="sr-overall-right" id="sr-overall-factors">
+                        <!-- Key factors rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Timeframe Grid -->
+                <div class="sr-timeframe-grid" id="sr-timeframe-grid">
+                    <!-- 4 timeframe cards rendered by JS -->
+                    <div class="glass-card sr-tf-card sr-loading" id="sr-tf-1d">
+                        <div class="sr-tf-label">1 DAY</div>
+                        <div class="sr-tf-spinner"></div>
+                    </div>
+                    <div class="glass-card sr-tf-card sr-loading" id="sr-tf-1w">
+                        <div class="sr-tf-label">1 WEEK</div>
+                        <div class="sr-tf-spinner"></div>
+                    </div>
+                    <div class="glass-card sr-tf-card sr-loading" id="sr-tf-1m">
+                        <div class="sr-tf-label">1 MONTH</div>
+                        <div class="sr-tf-spinner"></div>
+                    </div>
+                    <div class="glass-card sr-tf-card sr-loading" id="sr-tf-3m">
+                        <div class="sr-tf-label">3 MONTHS</div>
+                        <div class="sr-tf-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- News Impact Timeline -->
+                <div class="glass-card sr-news-impact" id="sr-news-impact">
+                    <h3 class="sr-news-title">📰 Recent News Impact</h3>
+                    <div class="sr-news-list" id="sr-news-list">
+                        <div style="padding: var(--space-lg); text-align: center; color: var(--text-muted); font-size: 0.82rem;">Loading news events...</div>
+                    </div>
+                </div>
+
+                <p class="meter-disclaimer" style="margin-top: var(--space-md);">Ratings reflect statistical tendencies from technical indicators. Not investment advice. Consult a SEBI-registered adviser.</p>
+            </div>
+
+            <!-- TradingView Layout -->
+            <div class="widget-grid">
+                <!-- Main Chart -->
+                <div class="widget-container widget-full">
+                    <div class="widget-header">📈 Advanced Interactive Chart</div>
+                    <div class="widget-body" id="tv_chart_main"></div>
+                </div>
+
+                <!-- Fundamentals -->
+                <div class="widget-container widget-half">
+                    <div class="widget-header">📊 Financial Fundamentals</div>
+                    <div class="widget-body" id="tv_fundamentals_main"></div>
+                </div>
+
+                <!-- Technicals -->
+                <div class="widget-container widget-half">
+                    <div class="widget-header">⏱️ Technical Gauge</div>
+                    <div class="widget-body" id="tv_technicals_main"></div>
+                </div>
+            </div>
+
+            <!-- Nison Candlestick Pattern Analysis -->
+            <div class="candlestick-section">
+                <div class="section-header-row">
+                    <div>
+                        <h2 class="section-title">🕯️ Candlestick Pattern Analysis</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: var(--space-xs);">Based on Steve Nison's <em>Japanese Candlestick Charting Techniques</em></p>
+                    </div>
+                    <select id="nison-period" class="nison-period-select">
+                        <option value="3mo">3 Months</option>
+                        <option value="6mo" selected>6 Months</option>
+                        <option value="1y">1 Year</option>
+                        <option value="2y">2 Years</option>
+                    </select>
+                </div>
+                <div class="candlestick-grid">
+                    <div class="glass-card nison-chart-card" id="nison-chart" style="position:relative;"></div>
+                    <div class="glass-card nison-patterns-card" id="nison-patterns"></div>
+                </div>
+                <div class="glass-card nison-prediction-card" id="nison-prediction"></div>
+                <p class="nison-disclaimer">⚠️ Pattern analysis shows statistical tendencies, not guarantees. This is for educational purposes only — not investment advice.</p>
+            </div>
+
+            <!-- AI Intelligence Section -->
+            <div class="ai-section">
+                <h2 class="section-title">Bharat AI Intelligence</h2>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-lg); font-size: 0.9rem;">Real-time synthesis of corporate filings, news, and market sentiment.</p>
+                
+                <div class="ai-grid">
+                    <!-- Left Col: AI Score -->
+                    <div class="glass-card score-card">
+                        <h3 style="margin-bottom: var(--space-lg); color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Current Conviction Score</h3>
+                        <div class="score-circle" id="ai-score-circle">--</div>
+                        <h4 id="ai-sentiment-label" style="font-size: 1.3rem; font-weight: 700; margin-bottom: var(--space-xs);">Analyzing...</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Confidence: <span id="ai-confidence" style="font-weight: 600;">—</span></p>
+                        
+                        <div class="factors-list">
+                            <h4 style="color: var(--color-positive);">Key Tailwinds</h4>
+                            <ul id="ai-pros">
+                                <li>Loading...</li>
+                            </ul>
+                            
+                            <h4 style="color: var(--color-negative);">Key Risks</h4>
+                            <ul id="ai-cons">
+                                <li>Loading...</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right Col: Event Feed -->
+                    <div class="glass-card">
+                        <h3 class="news-header">Latest Market Events</h3>
+                        <div id="ai-news-feed">
+                            <div class="loading-spinner">Fetching recent filings and news...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-copy">© 2026 Bharat Market Intelligence Agent</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <!-- TV Script -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="assets/js/api.js?v=2"></script>
+    <script src="assets/js/guide.js"></script>
+    <script src="assets/js/apikeys.js?v=2"></script>
+    <script src="assets/js/search.js?v=2"></script>
+    <script src="assets/js/candlestick.js?v=2"></script>
+    <script src="assets/js/company.js?v=2"></script>
+</body>
+</html>
